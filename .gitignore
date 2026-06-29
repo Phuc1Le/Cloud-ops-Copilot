@@ -1,0 +1,11 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
+*.tsbuildinfo
+.claude
+cloud-ops-copilot-accessKeys.csv
+*.csv
+*.pem
+*.key

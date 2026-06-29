@@ -1,0 +1,18 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudOpsCopilotReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "logs:FilterLogEvents",
+        "logs:DescribeLogGroups",
+        "lambda:ListFunctions",
+        "cloudwatch:GetMetricStatistics",
+        "ce:GetCostAndUsage"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

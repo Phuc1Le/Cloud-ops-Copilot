@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cloud-ops-copilot": {
+      "command": "npx",
+      "args": ["tsx", "src/index.ts"],
+      "env": {
+        "NODE_OPTIONS": "--use-system-ca"
+      }
+    }
+  }
+}
