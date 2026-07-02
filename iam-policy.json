@@ -6,11 +6,21 @@
       "Effect": "Allow",
       "Action": [
         "ec2:DescribeInstances",
+        "ec2:DescribeRegions",
         "logs:FilterLogEvents",
         "logs:DescribeLogGroups",
         "lambda:ListFunctions",
         "cloudwatch:GetMetricStatistics",
-        "ce:GetCostAndUsage"
+        "ce:GetCostAndUsage",
+        "s3:ListAllMyBuckets",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "iam:ListUsers",
+        "iam:GetLoginProfile",
+        "iam:ListMFADevices",
+        "cloudformation:DescribeStacks",
+        "cloudformation:DescribeStackEvents",
+        "health:DescribeEvents"
       ],
       "Resource": "*"
     }

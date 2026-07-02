@@ -9,3 +9,4 @@ cloud-ops-copilot-accessKeys.csv
 *.csv
 *.pem
 *.key
+.codegraph

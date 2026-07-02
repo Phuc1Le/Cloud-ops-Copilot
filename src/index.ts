@@ -6,6 +6,7 @@ import { searchLogsSchema, searchLogs } from "./tools/searchLogs.js";
 import dotenv from "dotenv";
 import { lambdaStatus, lambdaStatusSchema } from "./tools/lambdaStatus.js";
 import { costSummary, costSummarySchema } from "./tools/costSummary.js";
+import { browseS3, browseS3Schema } from "./tools/browseS3.js";
 dotenv.config();
 const server = new McpServer({
     name: "cloud-ops-copilot",
@@ -52,16 +53,27 @@ server.registerTool(
         inputSchema: lambdaStatusSchema,
     },
     lambdaStatus
-)
+);
 server.registerTool(
     "cost_summary",
     {
         title: "Cost summary",
-        description: "Summarize AWS costs grouped by service for the current billing period. Use when the user asks about cloud spending, billing, monthly costs, or which AWS services are contributing to their bill.",
+        description: 
+    "Summarize AWS costs grouped by service for the current billing period. Use when the user asks about cloud spending, billing, monthly costs, or which AWS services are contributing to their bill.",
         inputSchema: costSummarySchema,
     },
     costSummary
-)
+);
+server.registerTool(
+    "browse_s3",
+    {
+        title: "Browse S3",
+        description: 
+    "List AWS S3 buckets and browse objects within a bucket by prefix. Use when the user ask for a list of objects in an S3 bucket or a list of buckets.",
+        inputSchema: browseS3Schema,
+    },
+    browseS3
+);
 // stdio: Claude Code spawns this process and talks over stdin/stdout.
 // CRITICAL: never console.log to stdout — it corrupts the protocol.
 // Use console.error for any debug output.
