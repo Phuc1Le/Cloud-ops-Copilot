@@ -18,6 +18,7 @@
         "iam:ListUsers",
         "iam:GetLoginProfile",
         "iam:ListMFADevices",
+        "iam:ListAttachedUserPolicies",
         "cloudformation:DescribeStacks",
         "cloudformation:DescribeStackEvents",
         "health:DescribeEvents"

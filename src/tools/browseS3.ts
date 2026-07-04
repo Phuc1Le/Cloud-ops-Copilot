@@ -85,7 +85,7 @@ export async function browseS3(args: browseS3Args){
         const code = (err as any).name ?? "UnknownError";
         const msg = err instanceof Error ? err.message : String(err);
         const hint = code.includes("AccessDenied")
-            ? " — check lambda:ListFunctions and cloudwatch:GetMetricStatistics IAM permissions"
+            ? " — check s3:ListAllMyBuckets and s3:ListBucket IAM permissions"
             : "";
         return {
             content: [{ type: "text" as const, text: `Error [${code}]: ${msg}${hint}` }],

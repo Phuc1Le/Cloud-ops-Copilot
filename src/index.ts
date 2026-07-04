@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { lambdaStatus, lambdaStatusSchema } from "./tools/lambdaStatus.js";
 import { costSummary, costSummarySchema } from "./tools/costSummary.js";
 import { browseS3, browseS3Schema } from "./tools/browseS3.js";
+import { iamAuditSchema, iamAudit } from "./tools/iamAudit.js";
 dotenv.config();
 const server = new McpServer({
     name: "cloud-ops-copilot",
@@ -74,6 +75,15 @@ server.registerTool(
     },
     browseS3
 );
+server.registerTool(
+    "iam_audit",
+    {
+        title: "IAM Audit",
+        description: "List AWS IAM users with their last-activity date, console rights, policies attached, and whether MFA is enabled for that user. Use when you want to get information about IAM users.",
+        inputSchema: iamAuditSchema,
+    },
+    iamAudit
+)
 // stdio: Claude Code spawns this process and talks over stdin/stdout.
 // CRITICAL: never console.log to stdout — it corrupts the protocol.
 // Use console.error for any debug output.

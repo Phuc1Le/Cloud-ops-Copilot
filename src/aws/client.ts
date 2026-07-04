@@ -4,6 +4,8 @@ import { LambdaClient } from "@aws-sdk/client-lambda";
 import { CloudWatchClient } from "@aws-sdk/client-cloudwatch";
 import { CostExplorerClient } from "@aws-sdk/client-cost-explorer";
 import { S3Client } from "@aws-sdk/client-s3";
+import { IAMClient } from "@aws-sdk/client-iam";
+
 const region = process.env.AWS_REGION ?? "us-east-1";
 // The SDK automatically picks up the AWS_PROFILE env var, or falls back
 // to the default credential chain. No keys in code.
@@ -13,3 +15,5 @@ export const lambda = new LambdaClient({ region });
 export const cloudwatch = new CloudWatchClient({ region });
 export const costExplorer = new CostExplorerClient({ region:"us-east-1" })
 export const s3 = new S3Client({ region });
+// Initialize the IAM client
+export const iam = new IAMClient({ region });
