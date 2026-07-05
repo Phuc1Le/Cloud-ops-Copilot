@@ -1,8 +1,10 @@
 .env
 .env.local
 .env.*.local
+.mcp.json
 node_modules/
 dist/
+lambda-deploy.zip
 *.tsbuildinfo
 .claude
 cloud-ops-copilot-accessKeys.csv

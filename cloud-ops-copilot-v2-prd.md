@@ -388,7 +388,7 @@ A Lambda function needs a role that defines what AWS services it can call. This 
 6. Create role
 
 Copy the **Role ARN** — you'll need it in the next step. It looks like `arn:aws:iam::123456789012:role/cloud-ops-copilot-lambda-role`.
-
+arn:aws:iam::173210282413:role/cloud-ops-copilot-lambda-role
 ---
 
 ### Step 5.6 — Create the Lambda function
@@ -451,13 +451,34 @@ Your MCP endpoint is: `https://abcdef123456.lambda-url.us-east-1.on.aws/mcp`
 
 **Test it is alive:**
 
+The Streamable HTTP transport requires the `Accept` header to list **both** `application/json` and `text/event-stream` on every POST — omitting it (or sending only `Content-Type`) gets you a `406 Not Acceptable`, not a protocol error. This applies regardless of SDK version; it's part of the Streamable HTTP spec itself, not a recent breaking change.
+
+macOS/Linux/Git Bash (`curl`):
 ```bash
 curl -X POST https://YOUR_FUNCTION_URL/mcp \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 ```
 
-You should get a JSON response back with `"result":{"protocolVersion":...}`. If you get a 200, the server is alive.
+Windows PowerShell — **`curl` is aliased to `Invoke-WebRequest`**, which doesn't accept `-X`/`-H`/`-d` the way real `curl` does. Windows 10/11 ships an actual `curl.exe` at `C:\Windows\System32\curl.exe`; call it explicitly (bypassing the alias):
+
+Don't pass the JSON body inline with `-d '...'` in PowerShell. PowerShell re-quotes arguments before handing them to a native executable, and it reliably mangles a single-quoted string that contains embedded double quotes and braces (you'll see the Lambda log a `JSON.parse` error on a 1–2 character body — the JSON arrived corrupted, not missing). Write the body to a file instead and send it with `--data-binary @file`, which avoids PowerShell's argument re-quoting entirely:
+```powershell
+'{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' |
+  Out-File -Encoding utf8NoBOM -FilePath "$env:TEMP\mcp-init.json"
+
+curl.exe --ssl-no-revoke -X POST https://YOUR_FUNCTION_URL/mcp `
+  -H "Content-Type: application/json" `
+  -H "Accept: application/json, text/event-stream" `
+  --data-binary "@$env:TEMP\mcp-init.json"
+```
+
+Avoid `Invoke-RestMethod`/`Invoke-WebRequest` for this test too: Windows PowerShell 5.1's underlying `HttpWebRequest` treats `Accept` and `Content-Type` as "restricted" headers, and setting them via `-Headers` can silently mangle or drop them — producing the same 406 even though the hashtable looks correct. `curl.exe` doesn't have this problem.
+
+> `--ssl-no-revoke` is needed because Windows' curl build uses Schannel, which does its own certificate revocation (OCSP/CRL) check — this lookup is commonly blocked by VPNs, corporate firewalls, or antivirus TLS interception, producing `schannel: next InitializeSecurityContext failed: CRYPT_E_NO_REVOCATION_CHECK`. The flag skips only the revocation check; full chain/hostname/expiry validation still happens.
+
+The default response mode is SSE streaming, so expect the body to look like `event: message\ndata: {...}` rather than bare JSON — that's normal. You should see `"result":{"protocolVersion":...}` inside the `data:` line. If you get a response at all (not a connection error), the server is alive.
 
 ---
 
