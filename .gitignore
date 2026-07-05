@@ -2,6 +2,8 @@
 .env.local
 .env.*.local
 .mcp.json
+cloud-ops-copilot-prd.md
+cloud-ops-copilot-v2-prd.md
 node_modules/
 dist/
 lambda-deploy.zip
