@@ -6,6 +6,10 @@ const client = new Anthropic({
 });
 
 export async function POST(req: NextRequest) {
+    const apiKey = req.headers.get('x-api-key');
+    if (apiKey !== process.env.UI_API_KEY) {
+        return new Response('Unauthorized', { status: 401 });
+    }
   const { messages } = await req.json();
 
   const stream = client.beta.messages.stream({
