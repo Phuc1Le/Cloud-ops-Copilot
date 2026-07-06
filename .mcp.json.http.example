@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "cloud-ops-copilot": {
+      "type": "http",
+      "url": "https://YOUR_FUNCTION_URL/mcp"
+    }
+  }
+}
