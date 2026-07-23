@@ -1,18 +1,36 @@
-# Cloud Ops Copilot
+# Cloud Ops Copilot — AI-Powered AWS Operations Assistant
 
-An AWS operations assistant, built two ways on the same backend: a local **MCP server** for Claude Code, and a **hosted Lambda + web chat UI** for anyone else. Ask it things like:
+> Query your AWS infrastructure in natural language through Claude—locally via MCP or anywhere through a serverless deployment.
 
-- *"What S3 buckets do I have?"*
-- *"Do any of my IAM users have no MFA enabled?"*
-- *"Which of my Lambda functions threw errors in the last hour?"*
-- *"What's my top spend category this month?"*
-- *"Are any EC2 instances currently running?"*
-
-Claude decides which AWS tool to call, pulls live data, and answers in plain language.
+Cloud Ops Copilot is an AI-powered operations assistant that exposes AWS infrastructure through the Model Context Protocol (MCP). I built it to explore how LLMs can securely interact with cloud resources while applying modern AI infrastructure patterns such as MCP, serverless deployment, and least-privilege IAM.
 
 ---
 
-## Architecture
+## Why
+
+Cloud consoles expose a huge amount of operational information, but answering simple questions often requires navigating multiple AWS services.
+
+I built Cloud Ops Copilot to explore whether an LLM could act as a read-only cloud operations assistant by translating natural language into structured AWS API calls through MCP, while maintaining strong security guarantees through least-privilege IAM.
+
+## What It Does
+
+Cloud Ops Copilot exposes seven read-only AWS tools covering six AWS services.
+
+Users can ask questions like
+
+- Which EC2 instances are running?
+- Which IAM users have no MFA?
+- What are my Lambda error counts?
+- What's my AWS spend this month?
+
+Claude automatically selects the appropriate MCP tool, queries AWS, and summarizes the results in natural language.
+
+## How It Works
+
+The project shares a single MCP backend across two deployment models.
+
+- Local stdio server for Claude Code
+- Serverless HTTP deployment on AWS Lambda
 
 ```
 Claude Code CLI ──stdio──▶ MCP Server (local, src/index.ts)
@@ -39,6 +57,16 @@ Everything the tools do is **read-only** — nothing here can create, modify, or
 
 ---
 
+## Engineering Highlights
+
+- Designed a shared MCP backend powering both local and hosted deployments.
+- Deployed the same tool registry to AWS Lambda using Streamable HTTP transport.
+- Implemented least-privilege IAM with zero long-lived AWS credentials.
+- Built a streaming Next.js interface using Anthropic's native MCP connector.
+- Validated every tool through Zod schemas before AWS SDK execution.
+
+--- 
+
 ## Tools
 
 | Tool | AWS APIs | What it answers |
@@ -60,6 +88,14 @@ Everything the tools do is **read-only** — nothing here can create, modify, or
 - **The Lambda Function URL itself has no auth in front of it** (`Auth type: NONE`), which is a real, known tradeoff: anyone with the URL could call the AWS tools directly, bypassing the web UI's password gate entirely. Acceptable here because (a) every tool is strictly read-only, (b) the URL isn't published, and (c) this is a single-tenant demo pointed at one AWS account, not a multi-user product. A production version would put IAM auth or an API-key check directly on the Lambda, not just on the UI layer in front of it.
 - **The web UI has its own password gate** (`x-api-key` header, checked server-side in the API route) — but this only protects the chat UI's convenience layer, not the underlying Lambda, per the point above.
 - **The live URL is intentionally not published here.** It's a real, working deployment against a real personal AWS account and a metered Anthropic API key — publishing it would mean strangers running up API costs and probing a live account for no benefit to anyone. Treat the Vercel/Lambda deployment as a completed exercise, verified working, rather than a public demo link.
+
+---
+
+## What I Learned
+
+Building Cloud Ops Copilot taught me that deploying AI systems involves much more than connecting an LLM to APIs.
+
+The biggest engineering challenges were designing reusable MCP tools, deploying them in multiple environments, and enforcing security through IAM rather than application logic. If I continued this project, I would add authentication to the Function URL and support write operations through explicit confirmation workflows..
 
 ---
 
